@@ -45,6 +45,26 @@ namespace CollectionShortcuts
             Pairs = keyValuePairs.ToList();
         }
 
+        public FixCollection(ICollection<T> source)
+        {
+            FixCollection<T> fixSource = source as FixCollection<T>;
+
+            if (fixSource == null)
+            {
+                Pairs = new List<string>(source.Count * 2);
+
+                foreach (dynamic s in source)
+                {
+                    Pairs.Add(GetKey(s));
+                    Pairs.Add(s.Value);
+                }
+            }
+            else
+            {
+                Pairs = fixSource.Pairs;
+            }
+        }
+
         void ICollection<T>.Add(T item)
         {
             dynamic pair = item;
