@@ -161,5 +161,35 @@ namespace CollectionShortcuts
         {
             return this.GetEnumerator();
         }
+
+        public string this[string key]
+        {
+            get
+            {
+                for(int i = 0; i < Pairs.Count;i+=2)
+                {
+                    if(Pairs[i] == key)
+                    {
+                        return Pairs[i + 1];
+                    }
+                }
+
+                throw new IndexOutOfRangeException("The key index was not found in the colleciton. The key was " + key);
+            }
+            set
+            {
+                for(int i = 0; i < Pairs.Count;i+=2)
+                {
+                    if(Pairs[i] == key)
+                    {
+                        Pairs[i + 1] = value;
+                        return;
+                    }
+                }
+
+                Pairs.Add(key);
+                Pairs.Add(value);
+            }
+        }
     }
 }
