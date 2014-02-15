@@ -6,7 +6,93 @@ using System.Threading.Tasks;
 
 namespace CollectionShortcuts
 {
-    public class FixCollection
+    public class FixCollection<T> : ICollection<T> where T :new()
     {
+        private readonly List<string> Pairs;
+
+        public FixCollection(params string[] keyValuePairs)
+        {
+            if (keyValuePairs == null)
+            {
+                throw new ArgumentNullException("keyValuePairs");
+            }
+            if (keyValuePairs.Length % 2 != 0)
+            {
+                throw new ArgumentOutOfRangeException("keyValuePairs", "The length of arguments must be even, so that they can be paired.  The length was " + keyValuePairs.Length);
+            }
+            Pairs = keyValuePairs.ToList();
+        }
+
+        void ICollection<T>.Add(T item)
+        {
+            dynamic pair = item;
+
+            string key = pair.Name;
+            string value = pair.Value;
+
+            Pairs.Add(key);
+            Pairs.Add(value);
+        }
+
+        void ICollection<T>.Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ICollection<T>.Contains(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        int ICollection<T>.Count
+        {
+            get 
+            {
+                return Pairs.Count / 2;
+            }
+        }
+
+        bool ICollection<T>.IsReadOnly
+        {
+            get { return false; }
+        }
+
+        bool ICollection<T>.Remove(T item)
+        {
+            dynamic pair = item;
+            string key = pair.Name;
+            
+            for(int i = 0; i < Pairs.Count; i += 2)
+            {
+                if(Pairs[i] == key)
+                {
+                    Pairs.RemoveRange(i, 2);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for(int i = 0; i < Pairs.Count; i += 2)
+            {
+                dynamic result = new T();
+                result.Name = Pairs[i];
+                result.Value = Pairs[i + 1];
+                yield return result;
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
     }
 }
