@@ -42,7 +42,13 @@ namespace CollectionShortcuts
             {
                 throw new ArgumentOutOfRangeException("keyValuePairs", "The length of arguments must be even, so that they can be paired.  The length was " + keyValuePairs.Length);
             }
+
             Pairs = keyValuePairs.ToList();
+        }
+
+        private FixCollection(List<string> pairs)
+        {
+            Pairs = pairs;
         }
 
         public FixCollection(ICollection<T> source)
@@ -63,6 +69,25 @@ namespace CollectionShortcuts
             {
                 Pairs = fixSource.Pairs;
             }
+        }
+
+        public static FixCollection<T> NewFixCollection<TSource>(ICollection<TSource> source) where TSource : new()
+        {
+            FixCollection<TSource> fixSource = source as FixCollection<TSource>;
+
+            if (fixSource == null)
+            {
+                fixSource = new FixCollection<TSource>(source);
+            }
+
+            FixCollection<T> result = fixSource as FixCollection<T>;
+
+            if (result == null)
+            {
+                result = new FixCollection<T>(fixSource.Pairs);
+            }
+
+            return result;
         }
 
         void ICollection<T>.Add(T item)

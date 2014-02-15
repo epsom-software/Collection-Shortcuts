@@ -67,5 +67,54 @@ namespace CollectionShortcuts.Tests
             var target = new FixCollection<AnnoyingPairs.NamespaceA.NameValuePair>(source);
             Assert.AreEqual("key0", target.First().Key);
         }
+
+        [TestMethod]
+        public void CanCreateNewFixCollectionWithAnotherCollection()
+        {
+            ICollection<AnnoyingPairs.NamespaceA.NameValuePair> source = new Collection<AnnoyingPairs.NamespaceA.NameValuePair>
+            {
+                new AnnoyingPairs.NamespaceA.NameValuePair
+                {
+                    Key = "key0", 
+                    Value = "value0"
+                }
+            };
+
+            var target = FixCollection<AnnoyingPairs.NamespaceA.NameValuePair>.NewFixCollection(source);
+
+            Assert.AreEqual("key0", target.First().Key);
+            Assert.AreEqual("value0", target.First().Value);
+        }
+
+        [TestMethod]
+        public void CanCreateNewFixCollectionWithAnotherCollectionOfADifferentPair()
+        {
+            ICollection<AnnoyingPairs.NamespaceA.NameValuePair> source = new Collection<AnnoyingPairs.NamespaceA.NameValuePair>
+            {
+                new AnnoyingPairs.NamespaceA.NameValuePair
+                {
+                    Key = "key0", 
+                    Value = "value0"
+                }
+            };
+
+            var target = FixCollection<AnnoyingPairs.NamespaceB.TypeValuePair>.NewFixCollection(source);
+
+            Assert.AreEqual("key0", target.First().Key);
+            Assert.AreEqual("value0", target.First().Value);
+        }
+
+        [TestMethod]
+        public void WhenCreatingNewFixCollectionFromADifferentPairDoNotIterateOverSource()
+        {
+            ICollection<AnnoyingPairs.NamespaceA.NameValuePair> source = new FixCollectionStubWhichCantBeEnumerated(
+                "key0", "value0"
+            );
+
+            var target = FixCollection<AnnoyingPairs.NamespaceB.TypeValuePair>.NewFixCollection(source);
+
+            Assert.AreEqual("key0", target.First().Key);
+            Assert.AreEqual("value0", target.First().Value);
+        }
     }
 }
