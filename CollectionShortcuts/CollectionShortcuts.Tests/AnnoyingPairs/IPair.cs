@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CollectionShortcuts.Tests.AnnoyingPairs
 {
-    internal interface IPair
+    public interface IPair
     {
         string Key { get; set; }
         string Value { get; set; }

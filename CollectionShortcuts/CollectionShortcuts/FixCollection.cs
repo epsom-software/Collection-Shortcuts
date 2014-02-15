@@ -6,8 +6,30 @@ using System.Threading.Tasks;
 
 namespace CollectionShortcuts
 {
-    public class FixCollection<T> : ICollection<T> where T :new()
+    public class FixCollection<T> : ICollection<T> where T : new()
     {
+        private static readonly Func<dynamic, string> GetKey;
+        private static readonly Action<dynamic, string> SetKey;
+
+        static FixCollection()
+        {
+            switch (typeof(T).Name)
+            {
+                case "TypeValuePair":
+                    GetKey = pair => pair.Type;
+                    SetKey = (pair, key) => pair.Type = key;
+                    break;
+
+                case "NameValuePair":
+                    GetKey = pair => pair.Name;
+                    SetKey = (pair, key) => pair.Name = key;
+                    break;
+
+                default:
+                    throw new InvalidOperationException("FixCollection<T> was used with an invalid T.  T was " + typeof(T));
+            }
+        }
+
         private readonly List<string> Pairs;
 
         public FixCollection(params string[] keyValuePairs)
@@ -27,7 +49,7 @@ namespace CollectionShortcuts
         {
             dynamic pair = item;
 
-            string key = pair.Name;
+            string key = GetKey(pair);
             string value = pair.Value;
 
             Pairs.Add(key);
@@ -51,7 +73,7 @@ namespace CollectionShortcuts
 
         int ICollection<T>.Count
         {
-            get 
+            get
             {
                 return Pairs.Count / 2;
             }
@@ -65,11 +87,11 @@ namespace CollectionShortcuts
         bool ICollection<T>.Remove(T item)
         {
             dynamic pair = item;
-            string key = pair.Name;
-            
-            for(int i = 0; i < Pairs.Count; i += 2)
+            string key = GetKey(pair);
+
+            for (int i = 0; i < Pairs.Count; i += 2)
             {
-                if(Pairs[i] == key)
+                if (Pairs[i] == key)
                 {
                     Pairs.RemoveRange(i, 2);
                     return true;
@@ -81,10 +103,10 @@ namespace CollectionShortcuts
 
         public IEnumerator<T> GetEnumerator()
         {
-            for(int i = 0; i < Pairs.Count; i += 2)
+            for (int i = 0; i < Pairs.Count; i += 2)
             {
                 dynamic result = new T();
-                result.Name = Pairs[i];
+                SetKey(result, Pairs[i]);
                 result.Value = Pairs[i + 1];
                 yield return result;
             }

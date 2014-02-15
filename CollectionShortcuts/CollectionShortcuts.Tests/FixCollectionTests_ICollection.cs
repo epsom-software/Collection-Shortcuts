@@ -2,25 +2,45 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Collections;
+using CollectionShortcuts.Tests.AnnoyingPairs;
 
 namespace CollectionShortcuts.Tests
 {
     [TestClass]
-    public class FixCollectionTests_ICollection
+    public class FixCollectionTests_ICollection_NamespaceANameValuePair : FixCollectionTests_ICollection<AnnoyingPairs.NamespaceA.NameValuePair>
     {
-        ICollection<AnnoyingPairs.NamespaceA.NameValuePair> Target;
-        AnnoyingPairs.NamespaceA.NameValuePair ExamplePair;
+    }
+
+    [TestClass]
+    public class FixCollectionTests_ICollection_NamespaceATypeValuePair : FixCollectionTests_ICollection<AnnoyingPairs.NamespaceA.TypeValuePair>
+    {
+    }
+
+    [TestClass]
+    public class FixCollectionTests_ICollection_NamespaceBNameValuePair : FixCollectionTests_ICollection<AnnoyingPairs.NamespaceB.NameValuePair>
+    {
+    }
+
+    [TestClass]
+    public class FixCollectionTests_ICollection_NamespaceBTypeValuePair : FixCollectionTests_ICollection<AnnoyingPairs.NamespaceB.TypeValuePair>
+    {
+    }
+
+    public class FixCollectionTests_ICollection<TPair> where TPair : IPair, new()
+    {
+        ICollection<TPair> Target;
+        TPair ExamplePair;
 
         [TestInitialize]
         public void Init()
         {
-            Target = new FixCollection<AnnoyingPairs.NamespaceA.NameValuePair>(
+            Target = new FixCollection<TPair>(
                 "key0", "value0",
                 "key1", "value1",
                 "key2", "value2"
             );
 
-            ExamplePair = new AnnoyingPairs.NamespaceA.NameValuePair { Name = "testKey", Value = "testValue" };
+            ExamplePair = new TPair { Key = "testKey", Value = "testValue" };
         }
 
         [TestMethod]
@@ -54,7 +74,7 @@ namespace CollectionShortcuts.Tests
         [TestMethod]
         public void WhenGivenKnownKeyRemoveReturnsTrue()
         {
-            bool success = Target.Remove(new AnnoyingPairs.NamespaceA.NameValuePair { Key = "key1", Value = "testValue" });
+            bool success = Target.Remove(new TPair { Key = "key1", Value = "testValue" });
             Assert.IsTrue(success);
             Assert.AreEqual(2, Target.Count);
         }
@@ -62,12 +82,12 @@ namespace CollectionShortcuts.Tests
         [TestMethod]
         public void GetEnumeratorGeneric()
         {
-            IEnumerator<AnnoyingPairs.NamespaceA.NameValuePair> enumerator = Target.GetEnumerator();
+            IEnumerator<TPair> enumerator = Target.GetEnumerator();
             
             enumerator.MoveNext();
             enumerator.MoveNext();
 
-            AnnoyingPairs.NamespaceA.NameValuePair pair = enumerator.Current;
+            TPair pair = enumerator.Current;
             Assert.AreEqual("key1", pair.Key);
             Assert.AreEqual("value1", pair.Value);
         }
@@ -80,7 +100,7 @@ namespace CollectionShortcuts.Tests
             enumerator.MoveNext();
             enumerator.MoveNext();
 
-            AnnoyingPairs.NamespaceA.NameValuePair pair = (AnnoyingPairs.NamespaceA.NameValuePair)enumerator.Current;
+            TPair pair = (TPair)enumerator.Current;
             Assert.AreEqual("key1", pair.Key);
             Assert.AreEqual("value1", pair.Value);
         }
