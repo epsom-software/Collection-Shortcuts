@@ -54,7 +54,7 @@ namespace CollectionShortcuts.Tests
         [TestMethod]
         public void WhenGivenKnownKeyRemoveReturnsTrue()
         {
-            bool success = Target.Remove(new AnnoyingPairs.NamespaceA.NameValuePair { Name = "key1", Value = "testValue" });
+            bool success = Target.Remove(new AnnoyingPairs.NamespaceA.NameValuePair { Key = "key1", Value = "testValue" });
             Assert.IsTrue(success);
             Assert.AreEqual(2, Target.Count);
         }
@@ -68,7 +68,7 @@ namespace CollectionShortcuts.Tests
             enumerator.MoveNext();
 
             AnnoyingPairs.NamespaceA.NameValuePair pair = enumerator.Current;
-            Assert.AreEqual("key1", pair.Name);
+            Assert.AreEqual("key1", pair.Key);
             Assert.AreEqual("value1", pair.Value);
         }
 
@@ -81,7 +81,7 @@ namespace CollectionShortcuts.Tests
             enumerator.MoveNext();
 
             AnnoyingPairs.NamespaceA.NameValuePair pair = (AnnoyingPairs.NamespaceA.NameValuePair)enumerator.Current;
-            Assert.AreEqual("key1", pair.Name);
+            Assert.AreEqual("key1", pair.Key);
             Assert.AreEqual("value1", pair.Value);
         }
     }
