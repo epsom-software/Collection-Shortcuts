@@ -53,5 +53,18 @@ namespace CollectionShortcuts.Tests
             Assert.AreEqual("newValue", value);
         }
 
+        [TestMethod]
+        public void TryGet_WhenGivenAUnknownKeyReturnsNull()
+        {
+            string value = Target.TryGet("unknown");
+            Assert.IsNull(value);
+        }
+
+        [TestMethod]
+        public void TryGet_WhenGivenAKnownKeyReturnsValue()
+        {
+            string value = Target.TryGet("key2");
+            Assert.AreEqual("value2", value);
+        }
     }
 }

@@ -166,21 +166,18 @@ namespace CollectionShortcuts
         {
             get
             {
-                for(int i = 0; i < Pairs.Count;i+=2)
+                string value;
+                if (TryGet(key, out value))
                 {
-                    if(Pairs[i] == key)
-                    {
-                        return Pairs[i + 1];
-                    }
+                    return value;
                 }
-
                 throw new IndexOutOfRangeException("The key index was not found in the colleciton. The key was " + key);
             }
             set
             {
-                for(int i = 0; i < Pairs.Count;i+=2)
+                for (int i = 0; i < Pairs.Count; i += 2)
                 {
-                    if(Pairs[i] == key)
+                    if (Pairs[i] == key)
                     {
                         Pairs[i + 1] = value;
                         return;
@@ -190,6 +187,27 @@ namespace CollectionShortcuts
                 Pairs.Add(key);
                 Pairs.Add(value);
             }
+        }
+
+        public string TryGet(string key)
+        {
+            string value;
+            TryGet(key, out value);
+            return value;
+        }
+
+        private bool TryGet(string key, out string value)
+        {
+            for (int i = 0; i < Pairs.Count; i += 2)
+            {
+                if (Pairs[i] == key)
+                {
+                    value = Pairs[i + 1];
+                    return true;
+                }
+            }
+            value = null;
+            return false;
         }
     }
 }
