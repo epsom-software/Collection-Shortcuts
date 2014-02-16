@@ -103,18 +103,5 @@ namespace CollectionShortcuts.Tests
             Assert.AreEqual("key0", target.First().Key);
             Assert.AreEqual("value0", target.First().Value);
         }
-
-        [TestMethod]
-        public void WhenCreatingNewFixCollectionFromADifferentPairDoNotIterateOverSource()
-        {
-            ICollection<AnnoyingPairs.NamespaceA.NameValuePair> source = new FixCollectionStubWhichCantBeEnumerated(
-                "key0", "value0"
-            );
-
-            var target = FixCollection<AnnoyingPairs.NamespaceB.TypeValuePair>.NewFixCollection(source);
-
-            Assert.AreEqual("key0", target.First().Key);
-            Assert.AreEqual("value0", target.First().Value);
-        }
     }
 }

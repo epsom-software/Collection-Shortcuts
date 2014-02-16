@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace CollectionShortcuts
             }
         }
 
-        private readonly List<string> Pairs;
+        private readonly ICollection<T> Pairs;
 
         public FixCollection(params string[] keyValuePairs)
         {
@@ -43,48 +44,53 @@ namespace CollectionShortcuts
                 throw new ArgumentOutOfRangeException("keyValuePairs", "The length of arguments must be even, so that they can be paired.  The length was " + keyValuePairs.Length);
             }
 
-            Pairs = keyValuePairs.ToList();
-        }
+            Pairs = new Collection<T>();
 
-        private FixCollection(List<string> pairs)
-        {
-            Pairs = pairs;
-        }
-
-        public FixCollection(ICollection<T> source)
-        {
-            FixCollection<T> fixSource = source as FixCollection<T>;
-
-            if (fixSource == null)
+            for (int i = 0; i < keyValuePairs.Length; i += 2)
             {
-                Pairs = new List<string>(source.Count * 2);
+                dynamic pair = new T();
+                SetKey(pair, keyValuePairs[i]);
+                pair.Value = keyValuePairs[i + 1];
+                Pairs.Add(pair);
+            }
+        }
 
-                foreach (dynamic s in source)
-                {
-                    Pairs.Add(GetKey(s));
-                    Pairs.Add(s.Value);
-                }
+        public FixCollection(ICollection<T> pairs)
+        {
+            FixCollection<T> fixCollection = pairs as FixCollection<T>;
+            if(fixCollection != null)
+            {
+                Pairs = fixCollection.Pairs;
             }
             else
             {
-                Pairs = fixSource.Pairs;
+                Pairs = pairs;
             }
         }
 
         public static FixCollection<T> NewFixCollection<TSource>(ICollection<TSource> source) where TSource : new()
         {
-            FixCollection<TSource> fixSource = source as FixCollection<TSource>;
+            ICollection<T> collectionOfT = source as ICollection<T>;
 
-            if (fixSource == null)
+            if (collectionOfT == null)
             {
-                fixSource = new FixCollection<TSource>(source);
+                collectionOfT = new Collection<T>();
+                
+                foreach(dynamic s in source)
+                {
+                    dynamic t = new T();
+                    string key = FixCollection<TSource>.GetKey(s);
+                    SetKey(t, key);
+                    t.Value = s.Value;
+                    collectionOfT.Add(t);
+                }
             }
 
-            FixCollection<T> result = fixSource as FixCollection<T>;
+            FixCollection<T> result = collectionOfT as FixCollection<T>;
 
             if (result == null)
             {
-                result = new FixCollection<T>(fixSource.Pairs);
+                result = new FixCollection<T>(collectionOfT);
             }
 
             return result;
@@ -92,122 +98,105 @@ namespace CollectionShortcuts
 
         void ICollection<T>.Add(T item)
         {
-            dynamic pair = item;
-
-            string key = GetKey(pair);
-            string value = pair.Value;
-
-            Pairs.Add(key);
-            Pairs.Add(value);
+            Pairs.Add(item);
         }
 
         void ICollection<T>.Clear()
         {
-            throw new NotImplementedException();
+            Pairs.Clear();
         }
 
         bool ICollection<T>.Contains(T item)
         {
-            throw new NotImplementedException();
+            return Pairs.Contains(item);
         }
 
         void ICollection<T>.CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            Pairs.CopyTo(array, arrayIndex);
         }
 
         int ICollection<T>.Count
         {
             get
             {
-                return Pairs.Count / 2;
+                return Pairs.Count ;
             }
         }
 
         bool ICollection<T>.IsReadOnly
         {
-            get { return false; }
+            get { return Pairs.IsReadOnly; }
         }
 
         bool ICollection<T>.Remove(T item)
         {
-            dynamic pair = item;
-            string key = GetKey(pair);
-
-            for (int i = 0; i < Pairs.Count; i += 2)
+            T match;
+            if (TryGet(GetKey(item), out match))
             {
-                if (Pairs[i] == key)
-                {
-                    Pairs.RemoveRange(i, 2);
-                    return true;
-                }
+                return Pairs.Remove(match);
             }
-
             return false;
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = 0; i < Pairs.Count; i += 2)
-            {
-                dynamic result = new T();
-                SetKey(result, Pairs[i]);
-                result.Value = Pairs[i + 1];
-                yield return result;
-            }
+            return Pairs.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return Pairs.GetEnumerator();
         }
 
         public string this[string key]
         {
             get
             {
-                string value;
+                T value;
                 if (TryGet(key, out value))
                 {
-                    return value;
+                    return (value as dynamic).Value;
                 }
-                throw new IndexOutOfRangeException("The key index was not found in the colleciton. The key was " + key);
+                else
+                {
+                    throw new IndexOutOfRangeException("The key index was not found in the colleciton. The key was " + key);
+                }
             }
             set
             {
-                for (int i = 0; i < Pairs.Count; i += 2)
+                T match;
+                if(TryGet(key, out match))
                 {
-                    if (Pairs[i] == key)
-                    {
-                        Pairs[i + 1] = value;
-                        return;
-                    }
+                    (match as dynamic).Value = value;
                 }
-
-                Pairs.Add(key);
-                Pairs.Add(value);
+                else
+                {
+                    match  = new T();
+                    SetKey(match, key);
+                    (match as dynamic).Value = value;
+                    Pairs.Add(match);
+                }
             }
         }
 
         public string TryGet(string key)
         {
-            string value;
-            TryGet(key, out value);
-            return value;
+            T value;
+            if (TryGet(key, out value))
+            {
+                return (value as dynamic).Value;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        private bool TryGet(string key, out string value)
+        private bool TryGet(string key, out T value)
         {
-            for (int i = 0; i < Pairs.Count; i += 2)
-            {
-                if (Pairs[i] == key)
-                {
-                    value = Pairs[i + 1];
-                    return true;
-                }
-            }
-            value = null;
-            return false;
+            value = Pairs.FirstOrDefault(p => GetKey(p) == key);
+            return value != null;
         }
     }
 }
