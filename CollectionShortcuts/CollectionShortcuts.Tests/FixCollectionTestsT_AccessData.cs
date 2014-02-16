@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CollectionShortcuts.Tests
 {
     [TestClass]
-    public class FixCollectionTests_AccessData
+    public class FixCollectionTestsT_AccessData
     {
 
         FixCollection<AnnoyingPairs.NamespaceA.NameValuePair> Target;

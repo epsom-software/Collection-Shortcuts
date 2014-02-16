@@ -58,10 +58,10 @@
       <DependentUpon>PairTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="FixCollectionStubWhichCantBeEnumerated.cs" />
-    <Compile Include="FixCollectionTests_AccessData.cs" />
-    <Compile Include="FixCollectionTests_Constructor.cs" />
+    <Compile Include="FixCollectionTestsT_AccessData.cs" />
+    <Compile Include="FixCollectionTestsT_Constructor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FixCollectionTests_ICollection.cs" />
+    <Compile Include="FixCollectionTestsT_ICollection.cs" />
     <Compile Include="CollectionExtenstionTests.cs" />
   </ItemGroup>
   <ItemGroup>

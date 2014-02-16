@@ -7,7 +7,7 @@ using System.Linq;
 namespace CollectionShortcuts.Tests
 {
     [TestClass]
-    public class FixCollectionTests_Constructor
+    public class FixCollectionTestsT_Constructor
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
